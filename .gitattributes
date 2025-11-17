@@ -1,1 +1,2 @@
 *.h5 filter=lfs diff=lfs merge=lfs -text
+eye_disease_model_savedmodel/**/* filter=lfs diff=lfs merge=lfs -text
