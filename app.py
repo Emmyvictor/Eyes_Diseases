@@ -16,15 +16,7 @@ st.write("Upload an eye image to detect Cataract, Diabetic Retinopathy, or Glauc
 # Load model (cached to avoid reloading on every interaction)
 @st.cache_resource
 def load_eye_model():
-    import tensorflow as tf
-
-    model_path = "eye_disease_model_savedmodel"
-
-    if not os.path.exists(model_path):
-        st.error(f"Model not found at {model_path}")
-        st.stop()
-
-    return tf.keras.models.load_model(model_path)
+    return load_model("Eye_disease_model.h5", compile=False)
 
 
 # Class names for predictions
