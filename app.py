@@ -116,7 +116,7 @@ if uploaded_file is not None:
         st.markdown(f"**Confidence:** {confidence:.2f}%")
 
         # Progress bar for confidence
-        st.progress(confidence / 100)
+        st.progress(float(confidence / 100))
 
         # Show all class probabilities
         st.write("---")
