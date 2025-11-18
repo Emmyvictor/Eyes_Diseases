@@ -16,7 +16,35 @@ st.write("Upload an eye image to detect Cataract, Diabetic Retinopathy, or Glauc
 # Load model (cached to avoid reloading on every interaction)
 @st.cache_resource
 def load_eye_model():
-    return load_model("Eye_disease_model.h5", compile=False)
+    import gdown
+    import tensorflow as tf
+
+    model_file = "Eye_disease_model.h5"
+
+    # If model doesn't exist, download from Google Drive
+    if not os.path.exists(model_file):
+        st.info("⏳ Downloading model from Google Drive...")
+
+        # REPLACE THIS with your actual Google Drive file ID
+        file_id = "YOUR_FILE_ID_HERE"
+        url = f"https://https://drive.google.com/drive/folders/1Bim1I_FBKmEg5bWEczxgaG6DDHK4s_qY={file_id}"
+
+        try:
+            gdown.download(url, model_file, quiet=False)
+            st.success("✅ Model downloaded!")
+        except Exception as e:
+            st.error(f"Failed to download model: {e}")
+            st.stop()
+
+    # Load with TensorFlow 2.10 compatible settings
+    try:
+        return tf.keras.models.load_model(model_file, compile=False)
+    except Exception as e:
+        st.error(f"Failed to load model: {e}")
+        st.error(
+            "The model file may be incompatible. Please convert it using TensorFlow 2.10-2.12"
+        )
+        st.stop()
 
 
 # Class names for predictions
