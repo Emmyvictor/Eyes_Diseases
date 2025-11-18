@@ -16,32 +16,50 @@ st.write("Upload an eye image to detect Cataract, Diabetic Retinopathy, or Glauc
 # Load model (cached to avoid reloading on every interaction)
 @st.cache_resource
 def load_eye_model():
-    import json
-    from tensorflow.keras.models import model_from_json
+    import tensorflow as tf
+    from tensorflow import keras
+    from tensorflow.keras import layers
 
     weights_path = "model_weights.h5"
-    arch_path = "model_architecture.json"
 
-    # Check if files exist
-    if not os.path.exists(weights_path) or not os.path.exists(arch_path):
-        st.error(f"❌ Model files not found!")
-        st.info(
-            "Make sure model_weights.h5 and model_architecture.json are in your repository"
-        )
+    # Check if weights file exists
+    if not os.path.exists(weights_path):
+        st.error(f"❌ Model weights not found!")
+        st.info("Make sure model_weights.h5 is in your repository")
         st.stop()
 
     try:
-        # Load architecture
-        with open(arch_path, "r") as f:
-            model_json = json.load(f)
+        # Manually rebuild the model architecture based on the error message
+        model = keras.Sequential(
+            [
+                layers.Input(shape=(224, 224, 3)),
+                # Block 1
+                layers.SeparableConv2D(16, 3, padding="same", activation="relu"),
+                layers.BatchNormalization(),
+                layers.MaxPooling2D(2),
+                # Block 2
+                layers.SeparableConv2D(32, 3, padding="same", activation="relu"),
+                layers.BatchNormalization(),
+                layers.MaxPooling2D(2),
+                # Block 3
+                layers.SeparableConv2D(64, 3, padding="same", activation="relu"),
+                layers.BatchNormalization(),
+                layers.MaxPooling2D(2),
+                # Classifier
+                layers.Flatten(),
+                layers.Dense(64, activation="relu"),
+                layers.Dropout(0.4),
+                layers.Dense(
+                    4, activation="softmax"
+                ),  # 4 classes based on architecture
+            ]
+        )
 
-        # Reconstruct model
-        model = model_from_json(model_json)
-
-        # Load weights
+        # Load the weights
         model.load_weights(weights_path)
 
         return model
+
     except Exception as e:
         st.error(f"❌ Error loading model: {str(e)}")
         st.stop()
