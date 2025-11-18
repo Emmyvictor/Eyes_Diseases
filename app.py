@@ -16,18 +16,34 @@ st.write("Upload an eye image to detect Cataract, Diabetic Retinopathy, or Glauc
 # Load model (cached to avoid reloading on every interaction)
 @st.cache_resource
 def load_eye_model():
-    model_path = "Eye_disease_model.h5"
+    import json
+    from tensorflow.keras.models import model_from_json
 
-    if not os.path.exists(model_path):
-        st.error(f"❌ Model file '{model_path}' not found!")
-        st.info("Make sure Eye_disease_model.h5 is in your GitHub repository")
+    weights_path = "model_weights.h5"
+    arch_path = "model_architecture.json"
+
+    # Check if files exist
+    if not os.path.exists(weights_path) or not os.path.exists(arch_path):
+        st.error(f"❌ Model files not found!")
+        st.info(
+            "Make sure model_weights.h5 and model_architecture.json are in your repository"
+        )
         st.stop()
 
     try:
-        return load_model(model_path, compile=False)
+        # Load architecture
+        with open(arch_path, "r") as f:
+            model_json = json.load(f)
+
+        # Reconstruct model
+        model = model_from_json(model_json)
+
+        # Load weights
+        model.load_weights(weights_path)
+
+        return model
     except Exception as e:
         st.error(f"❌ Error loading model: {str(e)}")
-        st.info("Check that your requirements.txt has TensorFlow 2.10.0")
         st.stop()
 
 
