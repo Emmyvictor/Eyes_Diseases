@@ -65,8 +65,11 @@ def load_eye_model():
         st.stop()
 
 
-# Class names for predictions (4 classes - model outputs 4 predictions)
-class_names = ["Cataract", "Diabetic Retinopathy", "Glaucoma", "Normal"]
+# Class names for predictions (model only has 3 disease classes)
+class_names = ["Cataract", "Diabetic Retinopathy", "Glaucoma"]
+
+# Confidence threshold for "Normal" classification
+CONFIDENCE_THRESHOLD = 60  # If max confidence is below this, classify as Normal
 
 # Load the model
 with st.spinner("Loading model..."):
@@ -106,6 +109,14 @@ if uploaded_file is not None:
         predictions = model.predict(img_batch, verbose=0)
         predicted_class = np.argmax(predictions, axis=1)[0]
         confidence = np.max(predictions) * 100
+
+        # Determine if it's a normal eye based on confidence threshold
+        is_normal = confidence < CONFIDENCE_THRESHOLD
+
+        if is_normal:
+            predicted_disease = "Normal"
+        else:
+            predicted_disease = class_names[predicted_class]
 
     # Display results
     with col2:
