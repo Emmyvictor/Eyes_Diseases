@@ -65,8 +65,8 @@ def load_eye_model():
         st.stop()
 
 
-# Class names for predictions
-class_names = ["Cataract", "Diabetic Retinopathy", "Glaucoma"]
+# Class names for predictions (4 classes - model outputs 4 predictions)
+class_names = ["Cataract", "Diabetic Retinopathy", "Glaucoma", "Normal"]
 
 # Load the model
 with st.spinner("Loading model..."):
